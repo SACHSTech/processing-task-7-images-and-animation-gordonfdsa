@@ -3,17 +3,22 @@ import processing.core.PImage;
 
 public class Sketch extends PApplet {
 
+  // initializing images
   PImage imgDesertBackground;
   PImage imgMartianSaucer;
   PImage imgMartianDrone;
   PImage imgMartianDrone2;
+  PImage imgLaser;
 
-  // positions
+  // initializing positions/variables
+
+  // Martian Saucer/UFO thing
   float fltMartianSaucerX = 0;
   float fltMartianSaucerY = 100;
   int intMartianSaucerSpeedX = 1;
   int intDegrees = 0;
 
+  // Martian Drone
   float fltMartianDroneX = 200;
   float fltMartianDroneY = 600;
   int intMartianDroneSpeedX = 1;
@@ -39,6 +44,7 @@ public class Sketch extends PApplet {
     imgMartianSaucer = loadImage("Martian_Saucer.gif");
     imgMartianDrone = loadImage("Martian_Drone.png");
     imgMartianDrone2 = loadImage("Martian_Drone2.png");
+    imgLaser = loadImage("Laser.jpg");
   }
 
   /**
@@ -46,12 +52,15 @@ public class Sketch extends PApplet {
    */
   public void draw() {
 
+    // drawing desert background
     image(imgDesertBackground, 0, 0);
+
+    // calculates and updates the Saucer and Drone positions.
     calculateSaucerPosition();
     calculateDronePosition();
-    image(imgMartianSaucer, fltMartianSaucerX, fltMartianSaucerY);
-    pushMatrix();
 
+    // drawing martian drone
+    pushMatrix();
     translate(fltMartianDroneX, fltMartianDroneY);
     rotate(fltMartianDroneRotation);
     translate(-29, -16);
@@ -62,40 +71,73 @@ public class Sketch extends PApplet {
     }
     popMatrix();
 
+    // only want to draw the laser periodically
+    if (intDegrees % 400 < 180) {
+      image(imgLaser, fltMartianSaucerX + 92, fltMartianSaucerY + 60);
+    }
+    // drawing martian saucer
+    image(imgMartianSaucer, fltMartianSaucerX, fltMartianSaucerY);
+
     intDegrees += 1;
   }
 
-  // calculates the position of the UFO
+  /**
+   * Description: calculates the position of the saucer/UFO, uses global veriables
+   * to modify
+   * 
+   * No param, no return
+   */
   public void calculateSaucerPosition() {
+    // If the UFO is about to go out of the screen, make it bounce and travel the
+    // other way
     if (fltMartianSaucerX > width - 210 || fltMartianSaucerX < 0)
       intMartianSaucerSpeedX *= -1;
 
+    // Modify its (x,y) position
     fltMartianSaucerX += intMartianSaucerSpeedX;
     fltMartianSaucerY += cos(radians(intDegrees));
-
   }
 
-  // calculaes the position of the smaller drone
+  /**
+   * Description: calculaes the position of the smaller drone uses global
+   * veriables to modify
+   * 
+   * No param, no return
+   */
   public void calculateDronePosition() {
+    // If the Drone is about to go out of the screen, make it bounce and travel the
+    // other way
     if (fltMartianDroneX > width - 29 || fltMartianDroneX < 0)
       intMartianDroneSpeedX *= -1;
 
+    // Modify its (x,y) position
     fltMartianDroneX += intMartianDroneSpeedX;
 
+    // If the Drone is above the middle of the screen, set it to descending
+    // animation, when it touches the ground, make it ascend again
     if (fltMartianDroneY < 300)
       boolDescending = true;
     else if (fltMartianDroneY >= height - 32)
       boolDescending = false;
 
+    // If it is in the descending phase
     if (boolDescending) {
       fltMartianDroneY += 2;
+      // set the drone rotation to 0, meaning the drone is parrallel to the ground
       fltMartianDroneRotation = 0;
-    } else {
+    }
+    // If it is in the ascending phase
+    else {
       fltMartianDroneY -= 2 * cos(radians(3 * intDegrees)) + fltMartianDroneX / 1000;
+      // set angle of drone rotation to: arctan(current slope)
       fltMartianDroneRotation = (float) Math.atan((fltMartianDroneY - fltPrevPosY) / (fltMartianDroneX - fltPrevPosX));
     }
+
+    // Make sure Drone doesn't go out of screen of the bottom
     fltMartianDroneY = Math.min(height - 32, fltMartianDroneY);
 
+    // saves the current iteration (x,y) values to calculate slope with the next
+    // iteration's values.
     fltPrevPosX = fltMartianDroneX;
     fltPrevPosY = fltMartianDroneY;
 

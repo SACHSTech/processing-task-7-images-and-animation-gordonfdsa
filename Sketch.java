@@ -73,7 +73,9 @@ public class Sketch extends PApplet {
 
     // only want to draw the laser periodically
     if (intDegrees % 400 < 180) {
-      image(imgLaser, fltMartianSaucerX + 92, fltMartianSaucerY + 60);
+      noStroke();
+      fill(255);
+      rect(fltMartianSaucerX + 92, fltMartianSaucerY + 60, 25, 600);
     }
     // drawing martian saucer
     image(imgMartianSaucer, fltMartianSaucerX, fltMartianSaucerY);
@@ -132,9 +134,6 @@ public class Sketch extends PApplet {
       // set angle of drone rotation to: arctan(current slope)
       fltMartianDroneRotation = (float) Math.atan((fltMartianDroneY - fltPrevPosY) / (fltMartianDroneX - fltPrevPosX));
     }
-
-    // Make sure Drone doesn't go out of screen of the bottom
-    fltMartianDroneY = Math.min(height - 32, fltMartianDroneY);
 
     // saves the current iteration (x,y) values to calculate slope with the next
     // iteration's values.
